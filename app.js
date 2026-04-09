@@ -1,8 +1,7 @@
 /* ═══════════════════════════════════════════════════════
    FakeShield — Frontend Logic
    ═══════════════════════════════════════════════════════ */
-
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://fakeshield-project-2.onrender.com";
 let currentPlatform = "twitter";
 
 /* ── Health check ──────────────────────────────────────── */
