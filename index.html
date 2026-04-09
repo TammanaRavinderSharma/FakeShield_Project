@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FakeShield — Fake Profile Detector</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ░░ GRID BACKGROUND ░░ -->
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <!-- ░░ HEADER ░░ -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">FAKE<strong>SHIELD</strong></span>
+    </div>
+    <nav class="nav-pills">
+      <span class="pill active">Analyzer</span>
+      <span class="pill" onclick="showDocs()">How it works</span>
+    </nav>
+    <div class="status-bar">
+      <span class="dot" id="apiDot"></span>
+      <span id="apiStatus">Connecting…</span>
+    </div>
+  </header>
+
+  <!-- ░░ HERO ░░ -->
+  <section class="hero">
+    <div class="hero-tag">AI-Powered Detection Engine</div>
+    <h1 class="hero-title">Is this profile <em>real</em>?</h1>
+    <p class="hero-sub">Paste any social media, LinkedIn, or email data and get an instant
+      ML-backed fake profile risk assessment.</p>
+  </section>
+
+  <!-- ░░ MAIN LAYOUT ░░ -->
+  <main class="main-grid">
+
+    <!-- LEFT: INPUT FORM -->
+    <section class="card form-card">
+      <div class="card-header">
+        <span class="card-icon">⌨</span>
+        <h2>Profile Data</h2>
+      </div>
+
+      <!-- Platform selector -->
+      <div class="platform-selector">
+        <button class="platform-btn active" data-p="twitter">𝕏 Twitter</button>
+        <button class="platform-btn" data-p="linkedin">in LinkedIn</button>
+        <button class="platform-btn" data-p="instagram">📷 Instagram</button>
+        <button class="platform-btn" data-p="facebook">𝑓 Facebook</button>
+        <button class="platform-btn" data-p="email">✉ Email</button>
+      </div>
+
+      <form id="profileForm" autocomplete="off">
+        <div class="form-grid">
+
+          <div class="field" id="f-username">
+            <label>Username / Handle</label>
+            <input type="text" name="username" placeholder="@username" />
+          </div>
+
+          <div class="field" id="f-display_name">
+            <label>Display Name</label>
+            <input type="text" name="display_name" placeholder="Full Name" />
+          </div>
+
+          <div class="field wide" id="f-email">
+            <label>Email Address</label>
+            <input type="text" name="email" placeholder="user@domain.com" />
+          </div>
+
+          <div class="field wide" id="f-bio">
+            <label>Bio / About</label>
+            <textarea name="bio" rows="3" placeholder="Profile bio text…"></textarea>
+          </div>
+
+          <div class="field" id="f-followers">
+            <label>Followers</label>
+            <input type="number" name="followers" placeholder="0" min="0" />
+          </div>
+
+          <div class="field" id="f-following">
+            <label>Following</label>
+            <input type="number" name="following" placeholder="0" min="0" />
+          </div>
+
+          <div class="field" id="f-posts_count">
+            <label>Total Posts</label>
+            <input type="number" name="posts_count" placeholder="0" min="0" />
+          </div>
+
+          <div class="field" id="f-account_age_days">
+            <label>Account Age (days)</label>
+            <input type="number" name="account_age_days" placeholder="0" min="0" />
+          </div>
+
+          <div class="field wide" id="f-profile_pic_url">
+            <label>Profile Picture URL</label>
+            <input type="text" name="profile_pic_url" placeholder="https://…" />
+          </div>
+
+          <div class="field" id="f-website">
+            <label>Website</label>
+            <input type="text" name="website" placeholder="https://…" />
+          </div>
+
+          <div class="field" id="f-location">
+            <label>Location</label>
+            <input type="text" name="location" placeholder="City, Country" />
+          </div>
+
+          <!-- LinkedIn-specific -->
+          <div class="field linkedin-only hidden" id="f-job_title">
+            <label>Job Title</label>
+            <input type="text" name="job_title" placeholder="Software Engineer" />
+          </div>
+
+          <div class="field linkedin-only hidden" id="f-company">
+            <label>Company</label>
+            <input type="text" name="company" placeholder="ACME Corp" />
+          </div>
+
+          <div class="field linkedin-only hidden" id="f-education">
+            <label>Education</label>
+            <input type="text" name="education" placeholder="MIT, B.Sc." />
+          </div>
+
+          <div class="field linkedin-only hidden" id="f-connections">
+            <label>Connections</label>
+            <input type="number" name="connections" placeholder="0" min="0" />
+          </div>
+
+          <div class="field verified-row wide">
+            <label class="checkbox-label">
+              <input type="checkbox" name="verified" />
+              <span>Account is platform-verified ✓</span>
+            </label>
+          </div>
+
+          <div class="field wide" id="f-post_texts">
+            <label>Sample Posts (one per line, optional)</label>
+            <textarea name="post_texts" rows="4" placeholder="Paste up to 10 recent posts/messages…"></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-ghost" onclick="fillDemo()">Load Demo</button>
+          <button type="submit" class="btn-primary" id="analyzeBtn">
+            <span class="btn-label">Analyze Profile</span>
+            <span class="btn-spinner hidden" aria-hidden="true">⟳</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- RIGHT: RESULTS -->
+    <section class="card results-card" id="resultsCard">
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">⬡</div>
+        <p>Fill in profile data and hit<br/><strong>Analyze Profile</strong> to begin.</p>
+      </div>
+
+      <!-- Results (hidden until analyzed) -->
+      <div class="results-panel hidden" id="resultsPanel">
+
+        <div class="verdict-block" id="verdictBlock">
+          <div class="verdict-label" id="verdictLabel">—</div>
+          <div class="score-ring-wrap">
+            <svg class="score-ring" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="50"/>
+              <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="50"
+                stroke-dasharray="314" stroke-dashoffset="314"/>
+            </svg>
+            <div class="score-center">
+              <span class="score-num" id="scoreNum">0</span>
+              <span class="score-pct">%</span>
+              <span class="score-label">fake</span>
+            </div>
+          </div>
+          <div class="risk-badge" id="riskBadge">—</div>
+          <p class="summary-text" id="summaryText"></p>
+        </div>
+
+        <div class="signals-section">
+          <h3>Signal Breakdown</h3>
+          <div class="signals-list" id="signalsList"></div>
+        </div>
+
+        <div class="recs-section" id="recsSection">
+          <h3>Recommendations</h3>
+          <ul class="recs-list" id="recsList"></ul>
+        </div>
+
+        <div class="meta-row">
+          <span id="metaTimestamp"></span>
+          <span id="metaPlatform"></span>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ░░ HOW IT WORKS MODAL ░░ -->
+  <div class="modal-overlay hidden" id="docsModal" onclick="hideDocs(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="hideDocs()">✕</button>
+      <h2>How FakeShield Works</h2>
+      <div class="how-grid">
+        <div class="how-card">
+          <span class="how-icon">🔍</span>
+          <h4>Identity Analysis</h4>
+          <p>Username entropy, digit ratios, bot-pattern regex matching, display name quality,
+             disposable email domain detection.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-icon">📊</span>
+          <h4>Activity Heuristics</h4>
+          <p>Account age, posting frequency, follower/following ratio analysis,
+             LinkedIn connection depth.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-icon">🧠</span>
+          <h4>NLP Content Scan</h4>
+          <p>Spam keyword detection in bio & posts, sentiment variance analysis (flat
+             sentiment = bot indicator), duplicate post detection.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-icon">🤖</span>
+          <h4>ML Layer</h4>
+          <p>Random Forest classifier trained on synthetic profiles blends with
+             heuristic scores to produce the final fake probability.</p>
+        </div>
+      </div>
+      <p class="modal-note">Results are probabilistic — always combine with human judgment for high-stakes decisions.</p>
+    </div>
+  </div>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer">
+    <span>FakeShield v1.0 — Python + scikit-learn + NLTK</span>
+    <span>For research &amp; awareness purposes</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
